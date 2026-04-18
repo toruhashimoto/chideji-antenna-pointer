@@ -173,36 +173,22 @@ function handlePosition(pos) {
 
 // ---------- 方位センサー ----------
 
-function startOrientation() {
-  return new Promise((resolve, reject) => {
-    const attach = () => {
-      window.addEventListener("deviceorientation", handleOrientation, true);
-      window.addEventListener("deviceorientationabsolute", handleOrientation, true);
-      resolve();
-    };
+// iOSの DeviceOrientationEvent.requestPermission() は
+// 「ユーザー操作のコールスタック内」から同期的に呼び出す必要がある。
+// そのため start() の冒頭で即座に呼び、その Promise を引き回す。
+function requestOrientationPermission() {
+  if (
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  ) {
+    return DeviceOrientationEvent.requestPermission();
+  }
+  return Promise.resolve("granted");
+}
 
-    if (
-      typeof DeviceOrientationEvent !== "undefined" &&
-      typeof DeviceOrientationEvent.requestPermission === "function"
-    ) {
-      // iOS 13+
-      DeviceOrientationEvent.requestPermission()
-        .then((res) => {
-          if (res === "granted") {
-            attach();
-          } else {
-            setStatus("方位センサーの許可が得られませんでした", "error");
-            reject();
-          }
-        })
-        .catch((err) => {
-          setStatus(`方位センサーエラー: ${err.message}`, "error");
-          reject(err);
-        });
-    } else {
-      attach();
-    }
-  });
+function attachOrientationListeners() {
+  window.addEventListener("deviceorientation", handleOrientation, true);
+  window.addEventListener("deviceorientationabsolute", handleOrientation, true);
 }
 
 function handleOrientation(e) {
@@ -237,24 +223,43 @@ function setStatus(msg, cls) {
   el.permissionStatus.className = "status-text" + (cls ? " " + cls : "");
 }
 
-async function start() {
+// ★重要: iOSはユーザー操作中に requestPermission を呼ぶ必要があるため、
+// ここでは async/await を使わず、同期的に requestPermission を発火する。
+function start() {
   el.startBtn.disabled = true;
   el.startBtn.textContent = "接続中...";
-  setStatus("位置情報を取得中...");
+  setStatus("方位センサーを確認中...");
 
-  try {
-    await startGeolocation();
-    setStatus("方位センサーに接続中...");
-    await startOrientation();
-    setStatus("接続完了", "success");
+  // ★ click ハンドラのコールスタックから直接発火
+  const orientPromise = requestOrientationPermission();
 
-    el.permissionSection.hidden = true;
-    el.mainUi.hidden = false;
-  } catch (err) {
-    el.startBtn.disabled = false;
-    el.startBtn.textContent = "再試行";
-    console.error(err);
-  }
+  orientPromise
+    .then((res) => {
+      if (res !== "granted") {
+        throw new Error(
+          `方位センサー許可が「${res}」でした。iOS「設定」→「Safari」→「詳細」→「モーションと画面の向きのアクセス」を ON にしてください`
+        );
+      }
+      attachOrientationListeners();
+      setStatus("位置情報を取得中...");
+      return startGeolocation();
+    })
+    .then(() => {
+      setStatus("接続完了", "success");
+      el.permissionSection.hidden = true;
+      el.mainUi.hidden = false;
+    })
+    .catch((err) => {
+      console.error(err);
+      let msg = err && err.message ? err.message : String(err);
+      if (/gesture|activation/i.test(msg)) {
+        msg =
+          "ユーザー操作のタイミングが失われました。ページを再読込してもう一度「開始する」をタップしてください";
+      }
+      setStatus(msg, "error");
+      el.startBtn.disabled = false;
+      el.startBtn.textContent = "再試行";
+    });
 }
 
 function setupEvents() {
