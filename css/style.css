@@ -1,0 +1,316 @@
+:root {
+  --bg: #0a0a0a;
+  --card-bg: #1c1c1e;
+  --card-border: #2c2c2e;
+  --text: #ffffff;
+  --text-dim: #8e8e93;
+  --accent: #0a84ff;
+  --danger: #ff3b30;
+  --warning: #ff9500;
+  --success: #30d158;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  font-size: 16px;
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+
+header {
+  text-align: center;
+  padding: 8px 0 16px;
+}
+
+header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #0a84ff, #30d158);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.info {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.primary-btn, .secondary-btn {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #2c2c2e;
+  color: var(--text);
+  margin-top: 10px;
+}
+
+.primary-btn:active, .secondary-btn:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.status-text {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+  min-height: 1em;
+}
+
+.status-text.error { color: var(--danger); }
+.status-text.success { color: var(--success); }
+
+/* コンパス */
+.compass-section {
+  padding: 8px 0 16px;
+  text-align: center;
+}
+
+#compass {
+  position: relative;
+  width: min(320px, 85vw);
+  height: min(320px, 85vw);
+  margin: 0 auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #1c1c1e 0%, #0a0a0a 80%);
+  border: 2px solid var(--card-border);
+  box-shadow:
+    0 10px 40px rgba(10, 132, 255, 0.15),
+    inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+#compass-ring {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.15s linear;
+}
+
+.mark {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.mark-n {
+  top: 8px;
+  color: var(--danger);
+  font-size: 16px;
+}
+.mark-s { bottom: 8px; }
+.mark-e { right: 8px; top: 50%; left: auto; transform: translateY(-50%); }
+.mark-w { left: 8px; top: 50%; transform: translateY(-50%); }
+
+.mark-ne, .mark-se, .mark-sw, .mark-nw {
+  width: 3px;
+  height: 8px;
+  background: var(--text-dim);
+  border-radius: 2px;
+}
+.mark-ne { top: 20px; left: 77%; transform: rotate(45deg); }
+.mark-se { bottom: 20px; left: 77%; transform: rotate(-45deg); }
+.mark-sw { bottom: 20px; left: 23%; transform: rotate(45deg); }
+.mark-nw { top: 20px; left: 23%; transform: rotate(-45deg); }
+
+/* 矢印コンテナ(送信所方向) */
+#arrow-container {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.12s linear;
+  will-change: transform;
+}
+
+#arrow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 35%;
+  filter: drop-shadow(0 0 8px rgba(255, 59, 48, 0.6));
+}
+
+/* デバイス向きインジケーター */
+#device-pointer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.hint {
+  margin-top: 14px;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 情報カード */
+.info-card {
+  padding: 12px 16px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.info-row:last-child { border-bottom: none; }
+
+.label {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.value {
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.value.small { font-size: 14px; font-weight: 500; }
+
+.value.bearing {
+  color: var(--warning);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* セレクト */
+select {
+  width: 100%;
+  padding: 12px;
+  background: #2c2c2e;
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: inherit;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%238e8e93' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  margin-top: 8px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+/* details */
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+  list-style: none;
+  position: relative;
+  padding-right: 20px;
+}
+
+details summary::-webkit-details-marker { display: none; }
+
+details summary::after {
+  content: "›";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  transition: transform 0.2s;
+  color: var(--text-dim);
+  font-size: 20px;
+}
+
+details[open] summary::after {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.help-list {
+  padding: 12px 0 8px 20px;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.caveat {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 149, 0, 0.1);
+  border-left: 3px solid var(--warning);
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 4px;
+}
+
+/* アニメーション */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.searching {
+  animation: pulse 1.5s ease-in-out infinite;
+}
